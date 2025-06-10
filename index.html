@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nosso Tempo Especial</title>
+    
+    <!-- Tailwind CSS para estilização rápida e responsiva -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Google Fonts para uma fonte mais romântica -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@700&family=Montserrat:wght@400;600&display=swap" rel="stylesheet">
+
+    <style>
+        /* Estilos personalizados */
+        body {
+            font-family: 'Montserrat', sans-serif;
+            overflow-x: hidden; /* Previne a rolagem horizontal */
+        }
+
+        .font-dancing-script {
+            font-family: 'Dancing Script', cursive;
+        }
+
+        /* --- Animação das Flores --- */
+        .flower {
+            position: absolute;
+            top: -50px; /* Começa fora da tela */
+            font-size: 2rem;
+            opacity: 0.7;
+            animation: fall linear infinite;
+            z-index: 0;
+        }
+
+        /* Keyframes da animação de queda */
+        @keyframes fall {
+            0% {
+                transform: translateY(0) rotate(0deg);
+                opacity: 0.7;
+            }
+            100% {
+                transform: translateY(105vh) rotate(360deg); /* Cai até o final da tela e gira */
+                opacity: 0;
+            }
+        }
+    </style>
+</head>
+<body class="bg-gradient-to-br from-pink-200 to-purple-300">
+
+    <!-- Player de Áudio -->
+    <!-- IMPORTANTE: Substitua a URL abaixo pelo link direto do seu arquivo MP3 -->
+<audio id="player" src="musicas/Justin_Timberlake_-_Mirrors.mp3" autoplay loop></audio>
+
+
+    <!-- Overlay de Início -->
+    <div id="start-overlay" class="absolute inset-0 z-30 bg-black/50 flex flex-col items-center justify-center cursor-pointer transition-opacity duration-1000">
+        <h2 class="text-4xl font-dancing-script text-white">Nossa História</h2>
+        <p class="text-white mt-2">Clique para começar ♫</p>
+    </div>
+
+    <!-- Botão de controle de música -->
+    <button id="music-toggle" class="fixed top-4 right-4 z-20 w-12 h-12 bg-white/50 rounded-full flex items-center justify-center text-purple-700 shadow-lg transition-opacity duration-500 opacity-0 hidden">
+        <svg id="icon-sound-on" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon><path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"></path></svg>
+        <svg id="icon-sound-off" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="hidden"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon><line x1="23" y1="9" x2="17" y2="15"></line><line x1="17" y1="9" x2="23" y2="15"></line></svg>
+    </button>
+    
+    <!-- Container para a animação de flores -->
+    <div id="flower-container" class="absolute top-0 left-0 w-full h-full pointer-events-none"></div>
+
+    <!-- Conteúdo Principal -->
+    <main class="relative z-10 flex items-center justify-center min-h-screen p-4">
+        <div class="w-full max-w-4xl p-8 text-center bg-white/30 backdrop-blur-md rounded-2xl shadow-2xl text-gray-800">
+            
+            <!-- SEÇÃO DE FOTOS ATUALIZADA -->
+            <div class="mb-8 flex justify-center items-center gap-4 flex-wrap">
+                <!-- Foto 1 -->
+                <div class="bg-white p-2 pb-6 rounded-md shadow-lg transform -rotate-6 hover:rotate-0 hover:scale-110 transition-transform duration-300">
+                    <img src="imagens/img01.jpeg" 
+                         alt="Foto do casal se abraçando no espelho" 
+                         class="w-32 h-40 md:w-36 md:h-48 object-cover">
+                </div>
+                <!-- Foto 2 -->
+                 <div class="bg-white p-2 pb-6 rounded-md shadow-lg transform rotate-3 hover:rotate-0 hover:scale-110 transition-transform duration-300">
+                    <img src="imagens/img02.jpeg" 
+                         alt="Foto do casal abraçado" 
+                         class="w-32 h-40 md:w-36 md:h-48 object-cover">
+                </div>
+                <!-- Foto 3 -->
+                <div class="bg-white p-2 pb-6 rounded-md shadow-lg transform rotate-8 hover:rotate-0 hover:scale-110 transition-transform duration-300">
+                    <img src="imagens/img03.jpeg" 
+                         alt="Selfie do casal" 
+                         class="w-32 h-40 md:w-36 md:h-48 object-cover">
+                </div>
+            </div>
+
+            <h1 class="text-5xl md:text-7xl font-dancing-script text-pink-700 mb-6">
+                Nosso Tempo Juntos
+            </h1>
+
+            <!-- Contador -->
+            <div id="timer" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-4 text-center mb-8">
+                <!-- Os blocos do contador serão preenchidos pelo JavaScript -->
+            </div>
+
+            <!-- NOVA SEÇÃO DA CARTA -->
+            <div class="mt-8 pt-6 border-t border-pink-300">
+                <p id="message" class="text-base md:text-lg text-left text-purple-800 leading-relaxed">
+                    <!-- A mensagem será inserida aqui pelo JavaScript -->
+                </p>
+            </div>
+            
+        </div>
+    </main>
+
+    <script>
+        // --- ELEMENTOS ---
+        const startDate = new Date(2023, 10, 20, 20, 0, 0); // Exemplo: 12 de Junho de 2022 às 20:00
+        const loveMessage = `Feliz Dia dos Namorados, meu amor 💖<br><br>Amo cada segundo que passo com você. Amo, no fim do dia, poder te abraçar e sentir o quanto te amo. Mesmo no meio de toda essa doideira que é a vida, ter você ao meu lado me dá forças para continuar. E quero que você sinta isso também — que meu amor por você é abrigo, apoio e constância.<br><br>Quero viver muitos e muitos momentos ao seu lado, na alegria e na tristeza, porque tudo vale a pena quando é com você. Obrigado por tudo o que você faz por nós, por todo carinho, paciência e amor.<br><br>Essa mensagem é só uma pequena lembrança, mas é do fundo do meu coração, pra que você nunca se esqueça do quanto eu te amo.<br><br>Queria poder escrever mais, falar mais, ser mais... Mas mesmo quando minhas palavras faltam, eu sempre dou o meu melhor por você. Lembra disso, tá? ❤️<br><br>Com todo meu amor,<br>João Vitor Navarro`;
+
+        const timerElement = document.getElementById('timer');
+        const messageElement = document.getElementById('message');
+        const flowerContainer = document.getElementById('flower-container');
+        const music = document.getElementById('background-music');
+        const startOverlay = document.getElementById('start-overlay');
+        const musicToggleButton = document.getElementById('music-toggle');
+        const iconSoundOn = document.getElementById('icon-sound-on');
+        const iconSoundOff = document.getElementById('icon-sound-off');
+
+        // --- INICIALIZAÇÃO ---
+        messageElement.innerHTML = loveMessage;
+        
+        // Evento para iniciar a experiência
+        startOverlay.addEventListener('click', async () => {
+            startOverlay.style.opacity = '0';
+            setTimeout(() => {
+                startOverlay.style.display = 'none';
+            }, 1000);
+            
+            try {
+                await music.play();
+                iconSoundOn.classList.remove('hidden');
+                iconSoundOff.classList.add('hidden');
+            } catch (err) {
+                console.error("Erro ao iniciar a música. Interação do usuário pode ser necessária.", err);
+            }
+            
+            musicToggleButton.classList.remove('hidden');
+            setTimeout(() => musicToggleButton.style.opacity = '1', 50);
+        });
+
+        // Evento para controlar a música
+        musicToggleButton.addEventListener('click', async () => {
+            if (music.paused) {
+                try {
+                    await music.play();
+                    iconSoundOn.classList.remove('hidden');
+                    iconSoundOff.classList.add('hidden');
+                } catch (err) {
+                    console.error("Erro ao tocar a música:", err);
+                }
+            } else {
+                music.pause();
+                iconSoundOn.classList.add('hidden');
+                iconSoundOff.classList.remove('hidden');
+            }
+        });
+
+        function createTimeBlock(value, label) {
+            return `
+                <div class="bg-white/50 p-4 rounded-xl shadow-lg">
+                    <div class="text-4xl md:text-5xl font-bold text-pink-600">${value}</div>
+                    <div class="text-sm font-semibold uppercase text-purple-700 mt-1">${label}</div>
+                </div>
+            `;
+        }
+        
+        function updateTimer() {
+            const now = new Date();
+            let tempStartDate = new Date(startDate);
+            
+            let years = now.getFullYear() - tempStartDate.getFullYear();
+            let months = now.getMonth() - tempStartDate.getMonth();
+            let days = now.getDate() - tempStartDate.getDate();
+            let hours = now.getHours() - tempStartDate.getHours();
+            let minutes = now.getMinutes() - tempStartDate.getMinutes();
+            let seconds = now.getSeconds() - tempStartDate.getSeconds();
+
+            if (seconds < 0) { seconds += 60; minutes--; }
+            if (minutes < 0) { minutes += 60; hours--; }
+            if (hours < 0) { hours += 24; days--; }
+            if (days < 0) {
+                const lastMonth = new Date(now.getFullYear(), now.getMonth(), 0);
+                days += lastMonth.getDate();
+                months--;
+            }
+            if (months < 0) { months += 12; years--; }
+
+            timerElement.innerHTML = 
+                createTimeBlock(years, 'Anos') +
+                createTimeBlock(months, 'Meses') +
+                createTimeBlock(days, 'Dias') +
+                createTimeBlock(hours, 'Horas') +
+                createTimeBlock(minutes, 'Minutos') +
+                createTimeBlock(seconds, 'Segundos');
+        }
+
+        const flowers = ['🌸', '🌷', '🌹', '🌺', '💖', '💐'];
+        const numberOfFlowers = 30;
+
+        for (let i = 0; i < numberOfFlowers; i++) {
+            const flower = document.createElement('div');
+            flower.classList.add('flower');
+            flower.innerText = flowers[Math.floor(Math.random() * flowers.length)];
+            
+            flower.style.left = `${Math.random() * 100}vw`;
+            flower.style.fontSize = `${1 + Math.random() * 1.5}rem`;
+            flower.style.animationDuration = `${5 + Math.random() * 10}s`;
+            flower.style.animationDelay = `${Math.random() * 10}s`;
+            
+            flowerContainer.appendChild(flower);
+        }
+
+        updateTimer();
+        setInterval(updateTimer, 1000);
+    </script>
+</body>
+</html>
